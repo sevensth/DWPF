@@ -1,0 +1,8 @@
+<?php
+$article = $this->getVar('article');
+$articleId = $article[DWModelArticle::TablePostColumnId];
+$commentEnable = $article[DWModelArticle::TablePostColumnCommentStatus] == DWModelArticle::TablePostColumnCommentStatusValueOpen;
+?>
+<body class="single single-post postid-<?php echo $articleId; ?> <?php if(!$commentEnable) echo 'dw_post_disable_new_comment'; ?> single-format-standard et_frontend_customizer et_fixed_nav safari iphone et_full_width_page">
+    <div id="main-content">
+    	<article id="post-<?php echo $articleId; ?>" class="post-<?php echo $articleId; ?> post type-post status-publish format-standard has-post-thumbnail hentry category-blog et_pb_post">

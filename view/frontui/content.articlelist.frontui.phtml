@@ -1,0 +1,110 @@
+<div class="et_pb_section et_pb_inner_shadow">
+	<div class="et_pb_row">
+		<?php
+		$cateTree = $this->getVar('cate');
+		if ($cateTree && is_array($cateTree) && count($cateTree) > 0):
+		?>
+		<div class="et_pb_column et_pb_column_4_4">
+			<div class="et_pb_blog_grid_wrapper">
+				<div class="et_pb_blog_grid clearfix et_pb_bg_layout_light masonry">
+				<?php
+				$subCates = $cateTree[DWModelTerm::TreeNodeKeyChildren];
+				$articleExpectCount = 5;
+				foreach ($subCates as $id => &$cate):
+					$articleList = DWModelTerm::sharedModel()->getAllArticlesOfCateTree($cate, $articleExpectCount);
+					if (empty($articleList))
+					{
+						continue;
+					}
+				?>
+					<article id="post-248" class="post-248 post type-post status-publish format-standard has-post-thumbnail hentry dw_category_block dw_pb_outer_shadow category-blog et_pb_post masonry-brick">
+						<div class="et_pb_image_container">
+							<a href="<?php $this->sEcho($cate[DWModelTerm::CategoryKeyUrl]);?>">
+								<img src="<?php $this->sEcho($cate[DWModelTerm::CategoryKeyThumbnailUrl]);?>" alt="<?php $this->sEcho($cate[DWModelTerm::TableTermColumnName]); ?>" width="400" height="250">
+							</a>
+						</div> <!-- .et_pb_image_container -->
+						<h2><a href="<?php $this->sEcho($cate[DWModelTerm::CategoryKeyUrl]);?>"><?php echo $cate[DWModelTerm::TableTermColumnName]; ?></a></h2>
+						<ul class="dw_post_list dw_post_list_5">
+						<?php foreach ($articleList as $article): ?>
+							<li><a href="<?php $this->sEcho($article[DWModuleFrontuiArticle::ArticleUrlKey]);?>"><?php $this->sEcho($article[DWModelArticle::TablePostColumnTitle]);?></a></li>
+						<?php endforeach; ?>
+						</ul>
+					</article> 
+ 					<!-- .et_pb_post -->
+ 				<?php
+ 				endforeach;
+ 				?>
+				</div> <!-- .et_pb_posts -->
+			</div>
+		</div> <!-- .et_pb_column -->
+		<?php endif; ?>
+		
+		<?php
+		$articleList = $this->getVar('articleList');
+		if (!$articleList)
+		{
+			$articleList = $cateTree[DWModelTerm::CateKeyArticleList];
+		}
+		if (is_array($articleList) && count($articleList) > 0):
+		?>
+		<div id="content-area" class="clearfix">
+			<div id="left-area" class="dw_load_more_container dw_post_list">
+			
+				<div class="dw_load_more_result">
+				<?php foreach ($articleList as $article): ?>
+				<article id="post-1417" class="post-1417 post type-post status-publish format-standard hentry category-opengl-es-api tag-api tag-opengl et_pb_post">
+					<h2><a href="<?php $this->sEcho($article[DWModuleFrontuiArticle::ArticleUrlKey]);?>"><?php $this->sEcho($article[DWModelArticle::TablePostColumnTitle]);?></a></h2>
+					<p class="post-meta">
+                        <span class="dw_post_meta_element dw_post_meta_element_time"><time><?php $this->sEcho($article[DWModelArticle::TablePostColumnDate]);?></time></span>
+                        <span class="dw_post_meta_element dw_post_meta_element_author"><?php $this->sEcho($article[DWModelUser::TableUsersColumnDisplayName]);?></span>
+                        <?php
+                        if ($article['categories']):
+                            foreach ($article['categories'] as $category):
+                        ?>
+                                <a class="dw_post_meta_element dw_post_meta_element_category" href="<?php echo $category['url'];?>" title="<?php echo $category[DWModelTerm::TableTermTaxonomyColumnDescription]; ?>" rel="category"><?php echo $category[DWModelTerm::TableTermColumnName]; ?></a>
+                        <?php
+                            endforeach;
+                        else:
+                            $cate = $this->getVar('cate');
+                            if ($cate):
+                        ?>
+                                <a class="dw_post_meta_element dw_post_meta_element_category" href="<?php $this->sEcho($cateTree[DWModelTerm::CategoryKeyUrl]);?>" title="<?php $this->sEcho($cateTree[DWModelTerm::TableTermTaxonomyColumnDescription]); ?>" rel="category"><?php $this->sEcho($cateTree[DWModelTerm::TableTermColumnName]); ?></a>
+                        <?php
+                            endif;
+                        endif;
+                        ?>
+                    </p>
+					<p class="dw_post_list_digest"><?php echo $article[DWModelArticle::TablePostColumnDigest];?></p>
+
+                    <?php if ($article['tags']): ?>
+                    <footer>
+                        <span class="dw-tag-links">
+                        <?php foreach ($article['tags'] as $tag): ?>
+                            <a href="<?php $this->sEcho($tag['url']);?>" title="<?php $this->sEcho($tag[DWModelTerm::TableTermColumnName]); ?>" rel="tag"><?php $this->sEcho($tag[DWModelTerm::TableTermColumnName]); ?></a>
+                        <?php endforeach; ?>
+                        </span>
+                    </footer>
+                    <?php endif; ?>
+				</article><!-- .et_pb_post -->
+				<?php endforeach; ?>
+				</div>
+
+                <?php if($this->getVar('showLoadMoreButton')): ?>
+				<div class="dw_load_more">
+					<a
+                        class="et_pb_promo_button dw_load_more_idle"
+                        href="<?php $this->sEcho($this->getVar('href'));?>"
+                        count="<?php $this->sEcho($this->getVar('loadMoreCount'));?>"
+                        offset="<?php $this->sEcho($this->getVar('loadMoreOffset'));?>"
+                        base="<?php $this->sEcho($this->getVar('loadMoreBaseUrl'));?>"
+                        baseHRef="<?php $this->sEcho($this->getVar('loadMoreBaseHRef'));?>"
+                    >&nbsp;</a>
+				</div>
+                <?php endif; ?>
+
+			</div> <!-- #left-area -->
+		</div><!-- #content-area -->
+		<?php endif; ?>
+		
+	</div> <!-- .et_pb_row -->
+</div> <!-- .et_pb_section -->

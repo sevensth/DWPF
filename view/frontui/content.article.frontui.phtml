@@ -1,0 +1,60 @@
+<div class="container">
+	<div id="content-area" class="clearfix dw_blog_content">
+		<div id="left-area">
+        <?php
+        $article = $this->getVar('article');
+
+        $cateAdFilter = false;
+
+        //filter the specific category, articles under these categories should not show with Ads.
+        $cateAdFilterList = DWModelDwpfconfig::sharedModel()->getConfig(DWModelDwpfconfig::ConfigNameNoADCate);
+        if ($cateAdFilterList && $article['categories']):
+            foreach ($article['categories'] as $category):
+                $cateSlug = $category[DWModelTerm::TableTermColumnSlug];
+                if ($cateSlug && in_array($cateSlug, $cateAdFilterList))
+                {
+                    $cateAdFilter = true;
+                    break;
+                }
+            endforeach;
+        endif;
+
+        if (!$cateAdFilter && $article['tags']):
+            $cateAdFilterList = DWModelDwpfconfig::sharedModel()->getConfig(DWModelDwpfconfig::ConfigNameNoADTag);
+            if ($cateAdFilterList):
+                foreach ($article['tags'] as $tag):
+                    $tagSlug = $tag[DWModelTerm::TableTermColumnSlug];
+                    if ($tagSlug && in_array($tagSlug, $cateAdFilterList))
+                    {
+                        $cateAdFilter = true;
+                        break;
+                    }
+                endforeach;
+            endif;
+        endif;
+
+        if (!$cateAdFilter) :
+            $ad = $this->getVar('articleAd');
+            if ($ad && count($ad['list']) > 0) :
+        ?>
+                <div class="dw_post_ad dw_post_ad_w300 et_pb_inner_shadow">
+                    <div class="dw_ad_title_image">
+                        <a href="<?php echo $ad['url']; ?>">
+                            <img src="<?php echo $ad['image']; ?>">
+                        </a>
+                    </div>
+                    <?php foreach ($ad['list'] as $adContent) : ?>
+                    <div class="dw_ad_wrap dw_ad_wrap_w300"><?php echo $adContent; ?></div>
+                    <?php endforeach; ?>
+                </div>
+        <?php
+            endif;
+        endif;
+        ?>
+
+		<?php
+		echo $article['post_content'];
+		?>
+		</div>
+	</div>
+</div>

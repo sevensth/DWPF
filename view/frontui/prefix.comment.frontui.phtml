@@ -1,0 +1,15 @@
+<?php $commentCount = $this->getVar('commentCount'); ?>
+<section id="comment-wrap" class="container <?php if ($commentCount <= 0) {echo 'dw_empty_content';} ?>">
+    <h1 id="comments" class="page_title">
+        <?php
+        if ($commentCount > 0)
+        {
+            echo $commentCount;
+            $this->sEchoI18n('Comments');
+        }
+        else
+        {
+            $this->sEchoI18n('No comments');
+        }
+        ?>
+    </h1>

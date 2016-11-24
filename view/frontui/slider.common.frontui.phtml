@@ -1,0 +1,95 @@
+<?php
+$slideList = $this->getVar('slideList');
+if ($slideList):
+    $slideSetting = $slideList[DWModuleFrontuiCommon::DWPFSlideConfigKeySetting];
+    $slideSettingAuto = $slideSetting[DWModuleFrontuiCommon::DWPFSlideSettingKeyAuto];
+    $slideSettingInterval = $slideSetting[DWModuleFrontuiCommon::DWPFSlideSettingKeyInterval];
+    $slideSettingArrow = $slideSetting[DWModuleFrontuiCommon::DWPFSlideSettingKeyArrow];
+    $slideSettingControl = $slideSetting[DWModuleFrontuiCommon::DWPFSlideSettingKeyControl];
+
+    $slideContent = $slideList[DWModuleFrontuiCommon::DWPFSlideConfigKeyContent];
+?>
+<div class="et_pb_section <?php if ($this->getVar('fullWidthSlide')) {echo 'et_pb_fullwidth_section ';} ?>">
+    <div class="et_pb_slider et_pb_preload <?php
+    if (!$slideSettingArrow)
+    {
+        echo 'et_pb_slider_no_arrows ';
+    }
+    if (!$slideSettingControl)
+    {
+        echo 'et_pb_slider_no_pagination ';
+    }
+
+    if ($slideSettingAuto)
+    {
+        echo 'et_slider_auto ';
+    }
+    if ($slideSettingInterval)
+    {
+        echo 'et_slider_speed_'.$slideSettingInterval;
+    }
+    ?>">
+        <div class="et_pb_slides">
+
+            <?php
+            foreach ($slideContent as $key => $slide):
+                $slideImageUrl = $slide[DWModuleFrontuiCommon::DWPFSlideContentKeyImageUrl];
+                $slideBgImageUrl = $slide[DWModuleFrontuiCommon::DWPFSlideContentKeyBgImageUrl];
+                $slideButtonTitle = $slide[DWModuleFrontuiCommon::DWPFSlideContentKeyButtonTitle];
+                $slideButtonUlr = $slide[DWModuleFrontuiCommon::DWPFSlideContentKeyButtonUrl];
+                $textColor = $slide[DWModuleFrontuiCommon::DWPFSlideContentKeyTextColor];
+                $bgColor = $slide[DWModuleFrontuiCommon::DWPFSlideContentKeyBgColor];
+                $slideImageAlt = $slide[DWModuleFrontuiCommon::DWPFSlideContentKeyImageAlt];
+                $slideImageAlign = $slide[DWModuleFrontuiCommon::DWPFSlideContentKeyImageAlign];
+                $slideTitle = $slide[DWModuleFrontuiCommon::DWPFSlideContentKeyTitle];
+                $slideContent = $slide[DWModuleFrontuiCommon::DWPFSlideContentKeyContent];
+                $slideCanvasId = $slide[DWModuleFrontuiCommon::DWPFSlideContentKeyCanvasId];
+                $bgCanvasId = $slide[DWModuleFrontuiCommon::DWPFSlideContentKeyBgCanvasId];
+                $bgCanvasJs = $slide[DWModuleFrontuiCommon::DWPFSlideContentKeyBgCanvasJS];
+                ?>
+            <div
+                class="et_pb_slide <?php
+                if ($slideImageUrl)
+                {
+                    echo 'et_pb_slide_with_image ';
+                }
+                if ($slideImageAlign != DWModuleFrontuiCommon::DWPFSlideContentKeyImageAlignBottom)
+                {
+                    echo 'et_pb_media_alignment_center ';
+                }
+                echo 'et_pb_bg_layout_' . $textColor;
+                ?>"
+                style="
+                    background-color:<?php echo $bgColor; ?>;
+                    <?php if ($slideBgImageUrl) { echo "background-image:url($slideBgImageUrl);"; } ?>
+                    ">
+                <div class="et_pb_container clearfix">
+                    <?php if ($slideImageUrl): ?>
+                    <div class="et_pb_slide_image">
+                        <img src="<?php echo $slideImageUrl; ?>" alt="<?php echo $slideImageAlt; ?>">
+                    </div>
+                    <?php endif; ?>
+                    <div class="et_pb_slide_description">
+                        <h2><?php echo $slideTitle; ?></h2>
+                        <div class="et_pb_slide_content">
+                            <p><?php echo $slideContent; ?></p>
+                        </div>
+                        <?php if ($slideButtonTitle): ?>
+                        <a href="<?php echo $slideButtonUlr; ?>" class="et_pb_more_button"><?php echo $slideButtonTitle; ?></a>
+                        <?php endif; ?>
+                    </div> <!-- .et_pb_slide_description -->
+                </div> <!-- .et_pb_container -->
+                <?php if ($bgCanvasId): ?>
+                    <div class="dw_section_canvas_bg">
+                        <canvas id="<?php echo $bgCanvasId; ?>" class="<?php echo "dw-slide-bg-canvas-$bgCanvasId";?>"></canvas>
+                        <script type="text/javascript" src="<?php echo $bgCanvasJs; ?>"></script>
+                    </div>
+                <?php endif; ?>
+            </div> <!-- .et_pb_slide -->
+            <?php endforeach; ?>
+
+        </div> <!-- .et_pb_slides -->
+    </div> <!-- .et_pb_slider -->
+</div>
+<!-- .et_pb_section -->
+<?php endif; ?>

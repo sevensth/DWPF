@@ -1,0 +1,83 @@
+<header id="main-header" class="">
+	<div class="dw-fixed-header-bg"></div>
+	<div class="container clearfix">
+		<a href="<?php echo $this->getHomePageUrl(); ?>">
+			<img src="<?php echo $this->showImageUrl('logo-head.png'); ?>" alt="<?php echo $this->getEnv('siteName'); ?>" id="logo">
+		</a>
+
+		<div id="et-top-navigation">
+			<nav id="top-menu-nav">
+			<?php
+			function buildNav(&$menuList, $pid)
+			{
+				$html = '';
+				if ($pid == 0)
+				{
+					$html .= '<ul id="top-menu" class="nav">';
+				}
+				else
+				{
+					$html .= '<ul id="sub-menu">';
+				}
+				
+				$subMenuCount = 0;
+				
+				foreach ($menuList as &$menu)
+				{
+					if ($menu['menu_parent'] == $pid)
+					{
+						$subMenuCount++;
+						
+						$menuId = $menu['ID'];
+						$liId = "menu-item-$menuId";
+						$liClass = "$liId menu-item menu-item-type-post_type menu-item-object-page " . $menu['css'];
+						$aUrl = $menu['url'];
+						$menuName = $menu['name'];
+						
+						$subHtml = buildNav($menuList, $menuId);
+						if ($subHtml)
+						{
+							$liClass .= " menu-item-has-children";
+						}
+						
+						$html .= "<li id=\"$liId\" class=\"$liClass\">";
+						$html .= "<a href=\"$aUrl\">$menuName</a>";
+						if ($subHtml)
+						{
+							$html .= $subHtml;
+						}
+						$html .= '</li>';
+					}
+				}
+				
+				if ($subMenuCount == 0)
+				{
+					return NULL;
+				}
+				
+				$html .= '</ul>';
+				return $html;
+			}
+			$nav = $this->getVar('menu');
+			echo buildNav($nav, 0);
+			?>
+			</nav>
+
+			<div id="et_top_search">
+				<span id="et_search_icon"></span>
+				<form role="search" method="get" class="et-search-form et-hidden" action="<?php echo $this->getVar('searchAction'); ?>" target="_blank">
+					<input type="search" class="et-search-field" placeholder="<?php $this->sEchoI18n('Baidu insite search'); ?>…" value="" name="q" title="<?php $this->sEchoI18n('Search for'); ?>:">
+					<!-- <input type="hidden" name="ie" value="<?php echo $this->getEnv('siteCharset'); ?>"> -->
+					<input type="hidden" name="s" value="16676774490181569768">
+					<input type="hidden" name="entry" value="1">
+				</form>
+			</div>
+
+			<div id="et_mobile_nav_menu">
+				<a href="#" class="mobile_nav closed"><span class="mobile_menu_bar"></span></a>
+			</div>
+		</div>
+		<!-- #et-top-navigation -->
+	</div>
+	<!-- .container -->
+</header>

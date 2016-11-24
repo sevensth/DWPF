@@ -1,0 +1,32 @@
+<?php
+ob_start();
+$contentDomId = 'ie_alert_wrap';
+?>
+<div id="<?php echo $contentDomId; ?>" class="ie_alert_wrap">
+    <div class="ie_alert_bg"></div>
+    <div class="outer">
+        <div class="inner">
+            <div class="illustrate"></div>
+            <div class="p">同学，都什么年代了，你还在使用石器时代的浏览器</div>
+            <div class="lbl">
+                <span class="line"></span>
+                <span class="text">推荐使用的浏览器</span>
+            </div>
+            <ul class="list">
+                <li><a target="_blank" href="http://www.google.cn/intl/zh-CN/chrome/browser/"><span class="icon icon_chrome"></span><span class="txt">Chrome</span></a></li>
+                <li><a target="_blank" href="http://www.apple.com/cn/safari/"><span class="icon icon_safari"></span><span class="txt">Safari</span></a></li>
+                <li><a target="_blank" href="http://www.firefox.com.cn/download/"><span class="icon icon_firefox"></span><span class="txt">Firefox</span></a></li>
+                <li class="last"><a target="_blank" href="http://www.microsoft.com/zh-cn/download/internet-explorer.aspx"><span class="icon icon_ie"></span><span class="txt">IE9/10/11<br>标准模式</span></a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+<?php
+$html = ob_get_clean();
+$response = array(
+    'status' => 'success',
+    'content_dom_id' => $contentDomId,
+    'content' => $html,
+);
+echo json_encode($response);
+?>

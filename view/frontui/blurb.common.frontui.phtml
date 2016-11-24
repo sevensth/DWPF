@@ -1,0 +1,28 @@
+<?php
+$blurbCateList = $this->getVar('blurbCateList');
+if ($blurbCateList) :
+?>
+<div class="et_pb_section">
+	<div class="et_pb_row">
+        <?php foreach ($blurbCateList as $blurbCate): ?>
+		<div class="et_pb_column et_pb_column_1_4">
+			<div
+				class="et_pb_blurb et_pb_bg_layout_light et_pb_text_align_center">
+				<div class="et_pb_blurb_content">
+					<div class="et_pb_main_blurb_image">
+                        <a href="<?php echo $blurbCate[DWModelTerm::CategoryKeyUrl]; ?>" title="<?php echo $blurbCate[DWModelTerm::TableTermColumnName]; ?>"><img src="<?php echo $blurbCate[DWModuleFrontuiHomepage::BlurbCateKeyBlurbImage]; ?>" alt="<?php echo $blurbCate[DWModelTerm::TableTermColumnName]; ?>" class="et-waypoint et_pb_animation_top"></a>
+                    </div>
+					<h4><a href="<?php echo $blurbCate[DWModelTerm::CategoryKeyUrl]; ?>" title="<?php echo $blurbCate[DWModelTerm::TableTermColumnName]; ?>"><?php echo $blurbCate[DWModelTerm::TableTermColumnName]; ?></a></h4>
+                    <?php echo $blurbCate[DWModelTerm::TableTermTaxonomyColumnDescription]; ?>
+				</div>
+				<!-- .et_pb_blurb_content -->
+			</div>
+			<!-- .et_pb_blurb -->
+		</div>
+		<!-- .et_pb_column -->
+        <?php endforeach; ?>
+	</div>
+	<!-- .et_pb_row -->
+</div>
+<!-- .et_pb_section -->
+<?php endif; ?>

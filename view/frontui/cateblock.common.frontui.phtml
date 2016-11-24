@@ -1,0 +1,54 @@
+<?php
+$gridCateList = $this->getVar('gridCateList');
+if ($gridCateList) :
+?>
+<div class="et_pb_section et_pb_inner_shadow" style="background-color:#f5f5f5;">
+    <div class="et_pb_row">
+        <div class="et_pb_column et_pb_column_4_4">
+            <div class="et_pb_blog_grid_wrapper">
+                <div class="et_pb_blog_grid clearfix et_pb_bg_layout_light masonry" style="position: relative;">
+                    <?php
+                    $articleExpectCount = 5;
+                    $gridBlockAds = $this->getVar('gridBlockAds');
+                    foreach ($gridCateList as $key => $cate):
+                        if (!$cate) continue;
+                        if ($cate == DWModuleFrontuiHomepage::CategoryGridAsAD)
+                        {
+                            $ad = $gridBlockAds[$key];
+                            if ($ad) :
+                                ?>
+                                <article id="post-248" class="post-248 post type-post status-publish format-standard has-post-thumbnail hentry dw_category_block dw_pb_outer_shadow dw_category_block_ad category-blog et_pb_post masonry-brick">
+                                    <div class="et_pb_image_container">
+                                        <?php if($ad['url']) : ?><a href="<?php echo $ad['url']; ?>"><?php endif; ?>
+                                            <img src="<?php echo $ad['image']; ?>" width="400" height="250">
+                                        <?php if($ad['url']) : ?></a><?php endif; ?>
+                                    </div> <!-- .et_pb_image_container -->
+                                    <div class="dw_ad_wrap dw_ad_wrap_w250 dw_ad_wrap_h250"><?php echo $ad['content']; ?></div>
+                                </article>
+                                <?php
+                                endif;
+                            continue;
+                        }
+                        $articleList = DWModelTerm::sharedModel()->getAllArticlesOfCateTree($cate, $articleExpectCount);
+                        ?>
+                        <article id="post-248" class="post-248 post type-post status-publish format-standard has-post-thumbnail hentry dw_category_block dw_pb_outer_shadow category-blog et_pb_post masonry-brick">
+                            <div class="et_pb_image_container">
+                                <a href="<?php $this->sEcho($cate[DWModelTerm::CategoryKeyUrl]);?>">
+                                    <img src="<?php $this->sEcho($cate[DWModelTerm::CategoryKeyThumbnailUrl]);?>" alt="<?php $this->sEcho($cate[DWModelTerm::TableTermColumnName]); ?>" width="400" height="250">
+                                </a>
+                            </div> <!-- .et_pb_image_container -->
+                            <h2><a href="<?php $this->sEcho($cate[DWModelTerm::CategoryKeyUrl]);?>"><?php echo $cate[DWModelTerm::TableTermColumnName]; ?></a></h2>
+                            <ul class="dw_post_list dw_post_list_5">
+                                <?php foreach ($articleList as $article): ?>
+                                    <li><a href="<?php $this->sEcho($article[DWModuleFrontuiArticle::ArticleUrlKey]);?>"><?php $this->sEcho($article[DWModelArticle::TablePostColumnTitle]);?></a></li>
+                                <?php endforeach; ?>
+                            </ul>
+                        </article>
+                        <!-- .et_pb_post -->
+                    <?php endforeach; ?>
+                </div><!-- .et_pb_posts -->
+            </div>
+        </div> <!-- .et_pb_column -->
+    </div> <!-- .et_pb_row -->
+</div> <!-- .et_pb_section -->
+<?php endif; ?>

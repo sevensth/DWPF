@@ -1,0 +1,85 @@
+<?php
+
+//dreamingwish's avatar service
+$avatarLibPath = ROOT_PATH . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'function' . DIRECTORY_SEPARATOR . 'gravatar' . DIRECTORY_SEPARATOR . 'auth.lib.php';
+require_once $avatarLibPath;
+define('AVATAR_AUTH_KEY', 'e15b48f0');
+define('AVATAR_AUTH_CHECK', '5f3e33bc9805a597fa87892d24a639182e7b03a02b3b1d9750be0a7762692418');
+
+function renderCommentBody($thisP, $commentBody, $depth, $index)
+{
+    $postId = $thisP->getVar('postId');
+    $oddOrEven = $index % 2 == 0 ? 'even' : 'odd';
+    $byWho = $commentBody['isAuthor'] ? 'bypostauthor' : '';
+    $avatarSize = $commentBody['avatarSize'] ? $commentBody['avatarSize'] : 80;
+    $commentId = $commentBody[DWModelComment::TableCommentsColumnId];
+    $author = $commentBody[DWModelComment::TableCommentsColumnAuthor];
+    $userID = intval($commentBody[DWModelUser::TableUsersColumnId]);
+    if (empty($author))
+    {
+        $author = $thisP->getI18n('Anonymous');
+    }
+    $avatarUrl = $commentBody['avatarUrl'];
+    if (!$avatarUrl)
+    {
+        $hashBase = $commentBody[DWModelComment::TableCommentsColumnAuthorEmail];
+        if (!$hashBase) $hashBase = $author;
+        $seed = md5($hashBase);
+        $auth = DWIdenticonAuthHash($seed, AVATAR_AUTH_CHECK);
+        $avatarUrl = (DEBUG ? 'http://function.dreamingwish.com:81' : 'https://function.dreamingwish.com') . '/gravatar/' . $seed . '?s=80&d=identicon&rating=pg&auth=' . $auth . '&ak=' . AVATAR_AUTH_KEY;
+    }
+    ?>
+<li class="comment comment-author-ID-<?php $thisP->sEcho($userID); ?> comment-author-<?php $thisP->sEcho($author); ?> <?php echo $byWho; ?> <?php echo $oddOrEven; ?> thread-<?php echo $oddOrEven; ?> depth-<?php echo $depth; ?>" id="li-comment-<?php echo $commentId; ?>">
+    <article id="comment-<?php echo $commentId; ?>" class="comment-body <?php if ($userID > 0) { echo 'dw-by-user'; } else { echo 'dw-by-guest'; } ?> clearfix">
+        <div class="comment_avatar">
+            <img alt="" src="<?php echo $avatarUrl; ?>" class="avatar avatar-<?php echo $avatarSize; ?> photo" height="<?php echo $avatarSize; ?>" width="<?php echo $avatarSize; ?>">
+        </div>
+
+        <div class="comment_postinfo">
+            <span class="fn"><?php $thisP->sEcho($author); ?></span>
+            <span class="comment_date"><?php $thisP->sEcho($commentBody[DWModelComment::TableCommentsColumnDate]); ?></span>
+        </div> <!-- .comment_postinfo -->
+
+        <div class="comment_area">
+            <div class="comment-content clearfix">
+                <p><?php
+                $commentContent = $commentBody[DWModelComment::TableCommentsColumnContent];
+                if ($userID > 0)
+                {
+                    echo $commentContent;
+                }
+                else
+                {
+                    $thisP->sEcho($commentContent);
+                }
+                ?></p>
+                <span class="reply-container">
+                    <a class="comment-reply-link" href="<?php echo $commentBody['formUrl']; ?>?replytocom=<?php echo $commentId; ?>#respond" onclick="return addComment.moveForm(&quot;comment-<?php echo $commentId; ?>&quot;, &quot;<?php echo $commentId; ?>&quot;, &quot;respond&quot;, &quot;<?php echo $postId; ?>&quot;)"><?php $thisP->sEchoI18n('Reply'); ?></a>
+                </span>
+            </div> <!-- end comment-content-->
+        </div> <!-- end comment_area-->
+    </article> <!-- .comment-body -->
+    <?php renderCommentList($thisP, $commentBody[DWModelComment::CommentsTreeKeySubComments], $depth+1); ?>
+</li>
+<?php
+}
+
+function renderCommentList($thisP, $commentList, $depth = 0)
+{
+    if ($commentList && is_array($commentList))
+    {
+        $index = 0;
+        $listContainerTag = $depth == 0 ? 'ol' : 'ul';
+        $listContainerClasses = $depth == 0 ? 'commentlist clearfix' : 'children';
+        foreach ($commentList as $comment)
+        {
+            echo "<$listContainerTag class=\"$listContainerClasses\">";
+            renderCommentBody($thisP, $comment, $depth, $index);
+            echo "</$listContainerTag>";
+            $index++;
+        }
+    }
+}
+
+$commentList = $this->getVar('commentList');
+renderCommentList($this, $commentList);

@@ -1,0 +1,18 @@
+<?php
+$response = array(
+    'status' => $this->getVar('status'),
+    );
+
+$message = $this->getVar('message');
+if ($message)
+{
+    $response['message'] = $message;
+}
+
+$relatedField = $this->getVar('relatedField');
+if ($relatedField)
+{
+    $response['relatedField'] = $relatedField;
+}
+
+echo json_encode($response);

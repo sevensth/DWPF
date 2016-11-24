@@ -1,0 +1,87 @@
+<footer id="main-footer">
+
+	<div class="container">
+		<div id="footer-widgets" class="clearfix">
+			<div class="footer-widget">
+				<div id="text-2" class="fwidget et_pb_widget widget_text">
+					<h4 class="title"><?php $this->sEchoI18n('Tags'); ?></h4>
+					<div class="textwidget">
+						<p>
+                            <?php
+                            foreach ($this->getVar('tags') as $tag) :
+                                if ($tag[DWModelTerm::TableTermTaxonomyColumnContentCount] == 0) continue;
+                            ?>
+                            <a attr="weight:<?php echo $tag['wt']; ?> contentCount:<?php echo $tag['count']; ?>" href="<?php echo $tag['url']; ?>" style="font-size:<?php $this->sEcho($tag['fontSize']); ?>px" ><?php $this->sEcho($tag[DWModelTerm::TableTermColumnName]); ?></a>
+                            <?php endforeach; ?>
+						</p>
+					</div>
+				</div>
+				<!-- end .fwidget -->
+			</div>
+			<!-- end .footer-widget -->
+			<div class="footer-widget">
+				<div id="recent-posts-3"
+					class="fwidget et_pb_widget widget_recent_entries">
+					<h4 class="title"><?php $this->sEchoI18n('Recent Posts'); ?></h4>
+					<ul>
+					<?php foreach ($this->getVar('recentPosts') as $post): ?>
+						<li><a href="<?php echo $post['url']; ?>" title="<?php echo $post['post_title']; ?>"><?php echo $post['post_title']; ?></a></li>
+					<?php endforeach; ?>
+					</ul>
+				</div>
+				<!-- end .fwidget -->
+			</div>
+			<!-- end .footer-widget -->
+			<div class="footer-widget">
+				<div id="text-3" class="fwidget et_pb_widget widget_text">
+					<h4 class="title"><?php $this->sEchoI18n('About'); ?></h4>
+					<div class="textwidget">
+						<p><?php $this->sEcho($this->getVar('about')); ?></p>
+					</div>
+				</div>
+				<!-- end .fwidget -->
+			</div>
+			<!-- end .footer-widget -->
+			<div class="footer-widget last">
+				<div id="text-4" class="fwidget et_pb_widget widget_text">
+					<h4 class="title"><?php $this->sEchoI18n('Links'); ?></h4>
+                    <ul>
+                        <?php foreach ($this->getVar('links') as $link): ?>
+                            <li><a href="<?php echo $link[DWModelLink::TableLinkColumnUrl]; ?>" title="<?php $this->sEcho($link[DWModelLink::TableLinkColumnDescription]); ?>" ><?php echo $link[DWModelLink::TableLinkColumnName]; ?></a></li>
+                        <?php endforeach; ?>
+                    </ul>
+				</div>
+				<!-- end .fwidget -->
+			</div>
+			<!-- end .footer-widget -->
+		</div>
+		<!-- #footer-widgets -->
+	</div>
+	<!-- .container -->
+	<div id="footer-bottom">
+		<div class="container clearfix">
+			<ul id="et-social-icons">
+				<li class="et-social-icon et-social-share"><a href="#"> <span>Share</span>
+				</a></li>
+				<li class="et-social-icon et-social-rss"><a href="#"> <span>RSS</span>
+				</a></li>
+			</ul>
+
+			<p id="footer-info">©2014 <?php echo $this->getEnv('siteName'); ?> <?php echo $this->getVar('ICPNumber'); ?> | EXEC:<?php $beginTime = DWLibGlobals::getGlobal(DWLibGlobals::GlobalKeyBeginTime); $now = microtime(true); printf('%0.2f', $now-$beginTime); ?>s QUERY:<?php echo (DWModelAbstract::getDBSelectTimes()); ?></p>
+		</div>
+		<!-- .container -->
+	</div>
+</footer>
+<?php
+$this->showJavascriptTag('waypoints.min.js');
+$this->showJavascriptTag('custom.js');
+$this->showJavascriptTag('util.js');
+$this->showJavascriptTag('dw.js');
+
+if (!DEBUG) :
+?>
+<script type="text/javascript">
+    var _bdhmProtocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+    document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3F2e3d3a9fee1ddecbfa3e91792963e664' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<?php endif; ?>

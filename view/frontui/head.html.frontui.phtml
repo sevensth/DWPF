@@ -1,0 +1,30 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=<?php echo $this->getEnv('siteCharset'); ?>" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, minimal-ui">
+<meta name="generator" content="Dreamingwish">
+<meta name="description" content="<?php echo $this->getEnv('siteDescription'); ?>" />
+<?php
+$keyword = $this->getEnv('siteKeyword');
+if ($keyword) :
+?>
+<meta name="keyword" content="<?php echo $keyword; ?>" />
+<?php endif; ?>
+<link href="<?php $this->showImageUrl('favicon.ico'); ?>" type="image/x-icon" rel="shortcut icon">
+<title><?php
+    $htmlTitle = $this->getVar('htmlTitle');
+    $siteName = $this->getEnv('siteName');
+    $pageType = $this->getVar('pageType');
+    echo ($htmlTitle?"$htmlTitle - ":'') . ($pageType?"$pageType - ":'') . $siteName;
+    ?></title>
+    <?php $this->showCSSTag('style.css'); ?>
+    <?php $this->showCSSTag('dw.css'); ?>
+    <?php
+    $this->showJavascriptTag('jquery/jquery.min.js');
+    $this->showJavascriptTag('jquery/jquery-migrate.min.js');
+    ?>
+<!--[if lt IE 9]>
+    <?php $this->showJavascriptTag('html5.js'); ?>
+    <?php $this->showJavascriptTag('ie_alert/ie_alert.js'); ?>
+    <?php $this->showCSSTag('ie_alert/ie_alert.css'); ?>
+<![endif]-->
+</head>

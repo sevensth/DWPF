@@ -1,0 +1,408 @@
+<div id="comment_loader" class="dw_state_error container">
+    <span class="desc"><?php $this->sEchoI18n('Comments module has not loaded yet'); ?></span>
+    <span class="indicator"></span>
+</div>
+<script type="text/javascript">
+    (function($)
+    {
+        var postId = $('article.post').attr('id').replace('post-', '');
+        var url = "<?php echo $this->getVar('ajaxCommentsLoadUrl'); ?>" + postId;
+        var urlCacheTimestamp = new Date().getTime();
+        var isLoading = false;
+        var retryCallback;
+
+        function disableUserInteractiveDuringSubmit($comment_form)
+        {
+            addComment.enabled = false;
+            $('#respond').removeClass('dw_state_active');
+            $('#comment-wrap').addClass('dw_disable_user_interactive');
+        }
+
+        function enableUserInteractiveAfterSubmitOrFail($comment_form)
+        {
+            addComment.enabled = true;
+            $('#respond').addClass('dw_state_active').find('input[type=text], textarea').blur();
+            $('#comment-wrap').removeClass('dw_disable_user_interactive');
+        }
+
+        function validateNickName($input)
+        {
+            var text = $input.value;
+            var require = $($input).attr('aria-required');
+            if (text.length == 0)
+            {
+                return (require != 'true');
+            }
+
+            if (text.length > 20)
+            {
+                return false;
+            }
+            return true;
+        }
+
+        function validateEmail($input)
+        {
+            var text = $input.value;
+            var require = $($input).attr('aria-required');
+            if (text.length == 0)
+            {
+                return (require != 'true');
+            }
+
+            if (text.length > 255)
+            {
+                return false;
+            }
+            var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+            return re.test(text);
+        }
+
+        function validateWebsite($input)
+        {
+            var text = $input.value;
+            var require = $($input).attr('aria-required');
+            if (text.length == 0)
+            {
+                return (require != 'true');
+            }
+
+            if (text.length > 255)
+            {
+                return false;
+            }
+            var regexp = /^((https?|ftp):\/\/)?(((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:)*@)?(((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5]))|((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.?)(:\d*)?)(\/((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)+(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*)?)?(\?((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|[\uE000-\uF8FF]|\/|\?)*)?(\#((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|\/|\?)*)?$/i;
+            return regexp.test(text);
+        }
+
+        function validateCommentContent($input)
+        {
+            var text = $input.value;
+            var require = $($input).attr('aria-required');
+            if (text.length == 0)
+            {
+                return (require != 'true');
+            }
+            else if (text.length > 2000)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        function validateColorBlock($container)
+        {
+            return $container.hasClass('dw_human_check_has_seletions');
+        }
+
+        function checkForm($comment_form)
+        {
+            var allFieldValid = true;
+
+            var $name = $comment_form.find('#author')[0];
+            if(!validateNickName($name))
+            {
+                $($name).addClass('dw_state_invalid_value');
+                allFieldValid = false;
+            }
+            else
+            {
+                $($name).removeClass('dw_state_invalid_value');
+            }
+
+            var $email = $comment_form.find('#email')[0];
+            if(!validateEmail($email))
+            {
+                $($email).addClass('dw_state_invalid_value');
+                allFieldValid = false;
+            }
+            else
+            {
+                $($email).removeClass('dw_state_invalid_value');
+            }
+
+            var $url = $comment_form.find('#url')[0];
+            if(!validateWebsite($url))
+            {
+                $($url).addClass('dw_state_invalid_value');
+                allFieldValid = false;
+            }
+            else
+            {
+                $($url).removeClass('dw_state_invalid_value');
+            }
+
+            var $commentContent = $comment_form.find('#comment')[0];
+            if(!validateCommentContent($commentContent))
+            {
+                $($commentContent).addClass('dw_state_invalid_value');
+                allFieldValid = false;
+            }
+            else
+            {
+                $($commentContent).removeClass('dw_state_invalid_value');
+            }
+
+            var $colorBlockContainer = $comment_form.find('#dw_human_check');
+            if (validateColorBlock($colorBlockContainer))
+            {
+                $colorBlockContainer.removeClass('dw_state_invalid_value');
+            }
+            else
+            {
+                $colorBlockContainer.addClass('dw_state_invalid_value');
+                allFieldValid = false;
+            }
+
+            return allFieldValid;
+        }
+
+        function showFormErrorPrompt($comment_form, text)
+        {
+            $($comment_form).find('.dw_form_error_prompt').show().text('(x_x) ' + text);
+        }
+
+        function hideFormErrorPrompt($comment_form)
+        {
+            $($comment_form).find('.dw_form_error_prompt').hide();
+        }
+
+        function ajaxSubmitFormErrorHandler($comment_form, message, relatedField)
+        {
+            enableUserInteractiveAfterSubmitOrFail($comment_form);
+
+            if (message)
+            {
+                showFormErrorPrompt($comment_form, message);
+            }
+
+            if (relatedField)
+            {
+                $($comment_form).find('#'+relatedField).addClass('dw_state_invalid_value');
+            }
+        }
+
+        function ajaxSubmitForm($comment_form, $loader)
+        {
+            var postDataJson = $($comment_form).serializeArray();
+            var actionUrl = $comment_form.attr('action');
+            var type = $($comment_form).attr('method').toUpperCase() || 'POST';
+            $.ajax({
+                    url: actionUrl,
+                    type: type,
+                    data : postDataJson,
+                    dataType: "json",
+                    timeout : 30000
+                }
+            ).done(function(data, textStatus, jqXHR)
+                {
+                    if (jqXHR.status == 200)
+                    {
+                        if (data.status == 'success')
+                        {
+                            ajaxLoadComments($loader, url, true);
+                        }
+                        else
+                        {
+                            ajaxSubmitFormErrorHandler($comment_form, data.message, data.relatedField);
+                        }
+                    }
+                    else
+                    {
+                        ajaxSubmitFormErrorHandler($comment_form, '<?php $this->sEchoI18n('Network error.'); ?>');
+                    }
+                }
+            ).fail(function(jqXHR, textStatus, errorThrown)
+                {
+                    ajaxSubmitFormErrorHandler($comment_form, '<?php $this->sEchoI18n('Network error.'); ?>');
+                }
+            ).always(function(dataOrJqXHR, textStatus, jqXHROrErrorThrown)
+                {
+
+                });
+        }
+
+        function saveAuthorInfoIntoCookie($comment_form)
+        {
+            var name = $comment_form.find('#author').attr('value');
+            var email = $comment_form.find('#email').attr('value');
+            var url = $comment_form.find('#url').attr('value');
+            $.docCookies.setItem('comment_author_info_name', name);
+            $.docCookies.setItem('comment_author_info_email', email);
+            $.docCookies.setItem('comment_author_info_url', url);
+        }
+
+        function restoreAuthorInfoFromCookie($comment_form)
+        {
+            var name = $.docCookies.getItem('comment_author_info_name');
+            var email = $.docCookies.getItem('comment_author_info_email');
+            var url = $.docCookies.getItem('comment_author_info_url');
+            if (name && name.length > 0)
+            {
+                $comment_form.find('#author').attr('value', name);
+            }
+            if (email && email.length > 0)
+            {
+                $comment_form.find('#email').attr('value', email);
+            }
+            if (url && url.length > 0)
+            {
+                $comment_form.find('#url').attr('value', url);
+            }
+        }
+
+        function submitForm($comment_form, $loader)
+        {
+            disableUserInteractiveDuringSubmit($comment_form);
+            formPlaceholderTextRemover($comment_form);
+            if (checkForm($comment_form))
+            {
+                ajaxSubmitForm($comment_form, $loader);
+                saveAuthorInfoIntoCookie($comment_form);
+            }
+            else
+            {
+                enableUserInteractiveAfterSubmitOrFail($comment_form);
+            }
+        }
+
+        function setLoadStatusToActive($loader, text)
+        {
+            isLoading = true;
+            $($loader).removeClass('dw_state_error dw_action_retry').addClass('dw_state_active');
+            $($loader).find('.desc').text(text);
+        }
+
+        function setLoadStatusToError($loader, text, retry)
+        {
+            isLoading = false;
+            $($loader).removeClass('dw_state_active dw_action_retry').addClass('dw_state_error');
+            $($loader).find('.desc').text(text);
+            retryCallback = retry;
+            if (retry)
+            {
+                $($loader).addClass('dw_action_retry');
+            }
+        }
+
+        function resetLoadStatus($loader)
+        {
+            isLoading = false;
+            $($loader).removeClass('dw_state_active dw_state_error dw_action_retry');
+            retryCallback = undefined;
+        }
+
+        function prepareForm($comment_form, $loader)
+        {
+            $comment_form.find('textarea, input[type="text"]').focus(function(event){
+                var $target = $(event.target);
+                $target.removeClass('dw_state_invalid_value');
+            });
+            $comment_form.find('#comment_post_ID').attr('value', postId);
+            $comment_form.find('#dw_human_check span').click(function(event){
+                var $target = $(event.target);
+                $target.siblings('.dw_human_check_selected').removeClass('dw_human_check_selected');
+                $target.addClass('dw_human_check_selected').parent().addClass('dw_human_check_has_seletions').removeClass('dw_state_invalid_value');
+                $comment_form.find('#human_check_value').val($target.attr('value'));
+            });
+            restoreAuthorInfoFromCookie($comment_form);
+        }
+
+        function replaceComments(data, $loader)
+        {
+            resetLoadStatus($loader);
+
+            var commentId = $(data).attr('id');
+            var $comment = $('#'+commentId);
+            if ($comment.length > 0)
+            {
+                $comment.replaceWith(data);
+            }
+            else
+            {
+                $($loader).after(data);
+            }
+
+            var $comment_form = $('#commentform');
+            formPlaceHoldersInitializer($comment_form);
+            prepareForm($comment_form, $loader);
+            $comment_form.find('#submit').click(function() {
+                try
+                {
+                    submitForm($comment_form, $loader);
+                }
+                catch(exception)
+                {
+                    console.log(exception);
+                }
+                finally
+                {
+
+                }
+                return false;
+            });
+        }
+
+        function ajaxLoadComments($loader, url, updateCache)
+        {
+            if (isLoading)
+            {
+                return;
+            }
+
+            setLoadStatusToActive($loader, '<?php $this->sEchoI18n('Loading comments'); ?>');
+
+            var tmpCacheTimestamp = updateCache ? (new Date().getTime()) : urlCacheTimestamp;
+            var fullUrl = url + '&v=' + tmpCacheTimestamp;
+            $.ajax({
+                url: fullUrl,
+                dataType: "html",
+                timeout : 30000
+            }
+            ).done(function(data, textStatus, jqXHR)
+            {
+                if (jqXHR.status == 200)
+                {
+                    replaceComments(data, $loader);
+                    addComment.enabled = true;
+                    urlCacheTimestamp = tmpCacheTimestamp;
+                }
+            }
+            ).fail(function(jqXHR, textStatus, errorThrown)
+            {
+                setLoadStatusToError($loader, '<?php $this->sEchoI18n('Loading comments failed, click to retry.'); ?>', function(){
+                    ajaxLoadComments($loader, url, false);
+                });
+            }
+            ).always(function(dataOrJqXHR, textStatus, jqXHROrErrorThrown)
+            {
+
+            });
+        }
+
+        $(document).ready(function()
+        {
+            var $loader = $("#comment_loader");
+            resetLoadStatus($loader);
+            $loader.waypoint({
+                offset : '95%',
+                triggerOnce : true,
+                handler: function() {
+                    ajaxLoadComments(this, url, false);
+                }
+            });
+            $loader.click(function(){
+                if ($.isFunction(retryCallback))
+                {
+                    retryCallback();
+                }
+            });
+        });
+
+        //remove default js support warning in loader div.
+        resetLoadStatus();
+
+    })(jQuery);
+</script>
+<?php $this->showJavascriptTag('comment-reply.js'); ?>

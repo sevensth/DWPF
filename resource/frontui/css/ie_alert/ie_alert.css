@@ -1,0 +1,136 @@
+.ie_alert_wrap {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    _height:expression(document.documentElement.clientHeight+"px");
+    z-index: 999999;
+}
+
+.ie_alert_wrap .ie_alert_bg {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #000;
+    opacity: 0.6;
+    filter: alpha(opacity=60);
+}
+
+.ie_alert_wrap .outer {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-top: -185px;
+    margin-left: -275px;
+    width: 538px;
+    height: 358px;
+    padding: 6px;
+    background-color: #d4d4d4;
+}
+
+.ie_alert_wrap .inner {
+    position: absolute;
+    width: 539px;
+    height: 358px;
+    background-color: #fff;
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.ie_alert_wrap .illustrate {
+    width: 539px;
+    height: 125px;
+    background: url("../../img/ie_alert/cursor_evolution.jpg") no-repeat;
+}
+
+.ie_alert_wrap .p {
+    margin-top: 15px;
+    padding: 0 15px;
+    line-height: 24px;
+    font-size: 14px;
+    font-weight: 700;
+    text-align: center;
+    color: #333;
+}
+
+.ie_alert_wrap .lbl {
+    text-align: center;
+}
+
+.ie_alert_wrap .line {
+    display: block;
+    height: 1px;
+    margin: 30px 15px 0;
+    border-bottom: 1px solid #d4d4d4;
+}
+
+.ie_alert_wrap .text {
+    position: relative;
+    top: -12px;
+    display: inline-block;
+    padding: 0 20px;
+    color: #6e6e6e;
+    font-size: 14px;
+    background-color: #fff;
+}
+
+.ie_alert_wrap .list {
+    width: 501px;
+    padding-left: 20px;
+    margin: 20px auto 0;
+}
+
+.ie_alert_wrap .list li {
+    float: left;
+    width: 90px;
+    margin: 0 40px 0 0;
+    text-align: center;
+}
+
+.ie_alert_wrap .list li.last {
+    margin: 0;
+}
+
+.ie_alert_wrap li a {
+    cursor: pointer;
+}
+
+.ie_alert_wrap li .icon {
+    display: block;
+    width: 42px;
+    height: 42px;
+    margin: 0 auto;
+    background: url("../../img/ie_alert/browsers_logos.jpg") no-repeat;
+}
+
+.ie_alert_wrap li .icon_chrome {
+    background-position: 0 0;
+}
+
+.ie_alert_wrap li .icon_safari {
+    background-position: -44px 0;
+}
+
+.ie_alert_wrap li .icon_firefox {
+    background-position: -88px 0;
+}
+
+.ie_alert_wrap li .icon_ie {
+    background-position: -132px 0;
+}
+
+.ie_alert_wrap li .txt {
+    display: inline-block;
+    margin-top: 10px;
+}
+
+body {
+    overflow: hidden;
+}

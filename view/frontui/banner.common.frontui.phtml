@@ -1,0 +1,131 @@
+<div class="et_pb_section et_pb_fullwidth_section dw-page-banner <?php if (!$this->getVar('narrowBanner')) {
+    echo 'dw-page-tall-banner';
+} ?>">
+    <section class="et_pb_fullwidth_header et_pb_bg_layout_dark et_pb_text_align_left">
+        <div class="et_pb_row dw-page-banner-title-row">
+            <h1><?php echo $this->getVar('bannerTitle'); ?></h1>
+            <?php $bannerDigest = $this->getVar('bannerDigest');
+            if ($bannerDigest) : ?>
+                <p class="et_pb_fullwidth_header_subhead"><?php echo $bannerDigest; ?></p>
+            <?php endif; ?>
+        </div>
+
+        <div
+            class="dw-page-banner-meta-container dw-transition-duration-medium dw-transition-timing-function-smooth dw-transition-delay-little">
+            <div class="et_pb_row dw-page-banner-meta-row">
+                <?php
+                $article = $this->getVar('article');
+                $cateList = [];
+                if ($article) :
+                    ?>
+                    <p class="post-meta">
+                        <span
+                            class="dw_post_meta_element dw_post_meta_element_time dw-transition-duration-medium dw-transition-timing-function-smooth dw-transition-delay-little"><time><?php $this->sEcho($article[DWModelArticle::TablePostColumnDate]); ?></time></span>
+                        <span
+                            class="dw_post_meta_element dw_post_meta_element_author dw-transition-duration-medium dw-transition-timing-function-smooth dw-transition-delay-little"><?php $this->sEcho($article[DWModelUser::TableUsersColumnDisplayName]); ?></span>
+                        <?php
+                        if ($article['categories']):
+                            $cateList = $article['categories'];
+                        else:
+                            $cate = $this->getVar('cate');
+                            if ($cate):
+                                $cateList = [$cate];
+                            endif;
+                        endif;
+
+                        foreach ($cateList as $category):
+                            ?>
+                            <a class="dw_post_meta_element dw_post_meta_element_category dw-transition-duration-medium dw-transition-timing-function-smooth dw-transition-delay-little"
+                               href="<?php $this->sEcho($category[DWModelTerm::CategoryKeyUrl]); ?>"
+                               title="<?php $this->sEcho($category[DWModelTerm::TableTermTaxonomyColumnDescription]); ?>"
+                               rel="category"><?php echo $category[DWModelTerm::TableTermColumnName]; ?></a>
+                        <?php
+                        endforeach;
+                        ?>
+                    </p>
+                <?php endif; ?>
+            </div>
+            <?php if ($article) : ?>
+                <div class="dw-page-banner-meta-expand-row-display">
+                    <div class="et_pb_row dw-page-banner-meta-expand-row">
+                    </div>
+                </div>
+
+                <div class="dw-page-banner-meta-expand-row-storage">
+                    <?php
+                    $relatedPosts = $this->getVar('related');
+                    if (is_array($relatedPosts)) :
+                        foreach ($relatedPosts as $idxOfCate => $related) :
+                            $prev = array_reverse($related['prev'] ? array_replace([null, null], $related['prev']) : [null, null]);
+                        	$prevEmptyPrompt = ['There\'s no more earlier posts in "%s"', 'There\'s no previous one post in "%s"'];
+                            $next = $related['next'] ? array_replace([null, null], $related['next']) : [null, null];
+                            $nextEmptyPrompt = ['There\'s no next one post in "%s"', 'There\'s no more latter posts in "%s"'];
+                            $category = $cateList[$idxOfCate];
+                            $categoryName = $category[DWModelTerm::TableTermColumnName];
+                            ?>
+                            <div class="et_pb_row dw-page-banner-meta-expand-row">
+                                <?php foreach ($prev as $idx => $prevPost) : ?>
+                                    <div class="et_pb_column et_pb_column_1_4">
+                                        <?php if ($prevPost) : ?>
+                                        <a class="dw-related-post"
+                                           href="<?php $this->sEcho($prevPost[DWModuleFrontuiArticle::ArticleUrlKey]) ?>"
+                                           title="<?php $this->sEcho($prevPost[DWModelArticle::TablePostColumnDigest]) ?>">
+                                            <h2><?php $this->sEcho($prevPost[DWModelArticle::TablePostColumnTitle]); ?></h2>
+                                        </a>
+                                        <?php else: ?>
+                                        <div class="dw-related-post dw-related-post-invalid">
+                                            <p><?php
+                                                $i18nPattern = $this->getI18n($prevEmptyPrompt[$idx]);
+                                                printf($i18nPattern, $categoryName);
+                                            ?></p>
+                                        </div>
+                                        <?php endif; ?>
+                                    </div>
+                                <?php
+                                endforeach;
+
+                                foreach ($next as $idx => $nextPost) :
+                                    ?>
+                                    <div class="et_pb_column et_pb_column_1_4">
+                                        <?php if ($nextPost) : ?>
+                                            <a class="dw-related-post"
+                                               href="<?php $this->sEcho($nextPost[DWModuleFrontuiArticle::ArticleUrlKey]) ?>"
+                                               title="<?php $this->sEcho($nextPost[DWModelArticle::TablePostColumnDigest]) ?>">
+                                                <h2><?php $this->sEcho($nextPost[DWModelArticle::TablePostColumnTitle]); ?></h2>
+                                            </a>
+                                        <?php else: ?>
+                                            <div class="dw-related-post dw-related-post-invalid">
+                                                <p><?php
+                                                    $i18nPattern = $this->getI18n($nextEmptyPrompt[$idx]);
+                                                    printf($i18nPattern, $categoryName);
+                                                    ?></p>
+                                            </div>
+                                        <?php endif; ?>
+                                    </div>
+                                <?php
+                                endforeach;
+                                ?>
+                            </div>
+                        <?php
+                        endforeach;
+                    endif;
+                    ?>
+                </div>
+            <?php endif; ?>
+        </div>
+
+        <?php if ($article['tags']): ?>
+            <div
+                class="et_pb_row dw-page-banner-tag-row dw-transition-duration-medium dw-transition-timing-function-smooth dw-transition-delay-little">
+                <span class="dw-tag-links">
+                    <?php foreach ($article['tags'] as $tag): ?>
+                        <a href="<?php $this->sEcho($tag['url']); ?>"
+                           title="<?php $this->sEcho($tag[DWModelTerm::TableTermColumnName]); ?>"
+                           rel="tag"><?php $this->sEcho($tag[DWModelTerm::TableTermColumnName]); ?></a>
+                    <?php endforeach; ?>
+                </span>
+            </div>
+        <?php endif; ?>
+    </section>
+</div>
+<!-- .et_pb_section -->
